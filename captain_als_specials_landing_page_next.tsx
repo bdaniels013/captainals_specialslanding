@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React, { useMemo, useRef, useState } from "react";
 
-type SpecialsKey = "weeknights" | "lunch" | "happy" | "ten" | "chef";
+type SpecialsKey = "weeknights" | "lunch" | "happy" | "ten";
 
 type SpecialsCategory = {
   key: SpecialsKey;
@@ -68,17 +68,6 @@ const CATEGORIES: SpecialsCategory[] = [
       updatedText: "Updated weekly",
     },
   },
-  {
-    key: "chef",
-    label: "Chef's Specials",
-    description: "Limited features from the kitchen, available while they last.",
-    badge: "Chef's Picks",
-    image: {
-      src: "/specials/chef.jpg",
-      alt: "Captain Al's Chef's Specials graphic",
-      updatedText: "Updated as released",
-    },
-  },
 ];
 
 function clampIndex(i: number) {
@@ -128,15 +117,6 @@ function accentFor(key: SpecialsKey) {
         ring: "focus:ring-amber-600/25",
         border: "border-amber-600",
         bar: "bg-amber-600",
-      };
-    case "chef":
-      return {
-        active: "border-rose-700 bg-rose-700 text-white",
-        subtle: "border-rose-200 bg-rose-50 text-rose-950",
-        button: "bg-rose-700 text-white hover:bg-rose-800 focus:ring-rose-700/25",
-        ring: "focus:ring-rose-700/25",
-        border: "border-rose-700",
-        bar: "bg-rose-700",
       };
   }
 }
@@ -344,8 +324,8 @@ export default function CaptainAlsSpecialsLanding() {
             <img src={LOGOS.anchor} alt="" aria-hidden="true" className="h-24 w-24 object-contain" />
             <h2 className="mt-5 text-3xl font-semibold tracking-tight text-slate-950">Get the best stuff before you show up.</h2>
             <p className="mt-4 text-sm leading-6 text-slate-600">
-              Weekly specials, happy hour updates, and limited chef features in one place. Join the list and we will text the
-              latest drops.
+              Weekly specials, happy hour updates, and limited-time offers in one place. Join the list and we will text the latest
+              drops.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <button
