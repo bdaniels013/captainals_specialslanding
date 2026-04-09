@@ -76,10 +76,6 @@ function clampIndex(i: number) {
   return i;
 }
 
-function normalizePhone(raw: string) {
-  return raw.replace(/\D/g, "");
-}
-
 function accentFor(key: SpecialsKey) {
   switch (key) {
     case "weeknights":
@@ -87,7 +83,6 @@ function accentFor(key: SpecialsKey) {
         active: "border-red-700 bg-red-700 text-white",
         subtle: "border-red-200 bg-red-50 text-red-950",
         button: "bg-red-700 text-white hover:bg-red-800 focus:ring-red-700/25",
-        ring: "focus:ring-red-700/25",
         border: "border-red-700",
         bar: "bg-red-700",
       };
@@ -96,7 +91,6 @@ function accentFor(key: SpecialsKey) {
         active: "border-emerald-700 bg-emerald-700 text-white",
         subtle: "border-emerald-200 bg-emerald-50 text-emerald-950",
         button: "bg-emerald-700 text-white hover:bg-emerald-800 focus:ring-emerald-700/25",
-        ring: "focus:ring-emerald-700/25",
         border: "border-emerald-700",
         bar: "bg-emerald-700",
       };
@@ -105,7 +99,6 @@ function accentFor(key: SpecialsKey) {
         active: "border-cyan-700 bg-cyan-700 text-white",
         subtle: "border-cyan-200 bg-cyan-50 text-cyan-950",
         button: "bg-cyan-700 text-white hover:bg-cyan-800 focus:ring-cyan-700/25",
-        ring: "focus:ring-cyan-700/25",
         border: "border-cyan-700",
         bar: "bg-cyan-700",
       };
@@ -114,7 +107,6 @@ function accentFor(key: SpecialsKey) {
         active: "border-amber-700 bg-amber-600 text-white",
         subtle: "border-amber-200 bg-amber-50 text-amber-950",
         button: "bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-600/25",
-        ring: "focus:ring-amber-600/25",
         border: "border-amber-600",
         bar: "bg-amber-600",
       };
@@ -123,9 +115,7 @@ function accentFor(key: SpecialsKey) {
 
 export default function CaptainAlsSpecialsLanding() {
   const [active, setActive] = useState<SpecialsKey>("weeknights");
-  const [formOpen, setFormOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
+  const touchStartX = useRef<number | null>(null);
 
   const activeIndex = useMemo(
     () => Math.max(0, CATEGORIES.findIndex((category) => category.key === active)),
@@ -133,7 +123,11 @@ export default function CaptainAlsSpecialsLanding() {
   );
   const activeCategory = CATEGORIES[activeIndex];
   const accent = accentFor(activeCategory.key);
-  const touchStartX = useRef<number | null>(null);
+
+  function setRelativeCategory(step: number) {
+    const next = clampIndex(activeIndex + step);
+    setActive(CATEGORIES[next].key);
+  }
 
   function onTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0]?.clientX ?? null;
@@ -147,70 +141,7 @@ export default function CaptainAlsSpecialsLanding() {
     touchStartX.current = null;
     if (Math.abs(dx) < 40) return;
 
-    const next = clampIndex(activeIndex + (dx < 0 ? 1 : -1));
-    setActive(CATEGORIES[next].key);
-  }
-
-  function showToast(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(null), 3500);
-  }
-
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (submitting) return;
-
-    const form = e.currentTarget;
-    const fd = new FormData(form);
-    const consent = fd.get("consent") === "on";
-    const phone = normalizePhone(String(fd.get("phone") ?? ""));
-
-    if (!consent) {
-      showToast("Please check the consent box to enter and receive updates.");
-      return;
-    }
-
-    if (phone.length < 10) {
-      showToast("Please enter a valid phone number.");
-      return;
-    }
-
-    const payload = {
-      name: String(fd.get("name") ?? "").trim(),
-      email: String(fd.get("email") ?? "").trim(),
-      phone,
-      consent,
-      categoryPreference: activeCategory.key,
-      source: "captain-als-specials-landing",
-      giveaway: {
-        enabled: true,
-        incentive: "$100 Gift Card Monthly Drawing",
-      },
-    };
-
-    try {
-      setSubmitting(true);
-
-      const res = await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.message || "Submission failed");
-      }
-
-      showToast("You're entered. Watch for a text soon.");
-      form.reset();
-      setFormOpen(false);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Something went wrong. Please try again.";
-      showToast(message);
-    } finally {
-      setSubmitting(false);
-    }
+    setRelativeCategory(dx < 0 ? 1 : -1);
   }
 
   return (
@@ -234,27 +165,13 @@ export default function CaptainAlsSpecialsLanding() {
             </a>
             <a
               href="tel:228-831-5751"
-              className="hidden rounded-lg border border-white/20 px-3 py-2 text-sm font-semibold text-white hover:bg-white/10 sm:inline-flex"
+              className="rounded-lg border border-white/20 px-3 py-2 text-sm font-semibold text-white hover:bg-white/10"
             >
               Call
             </a>
-            <button
-              onClick={() => setFormOpen(true)}
-              className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-white/40"
-            >
-              Enter to Win
-            </button>
           </div>
         </div>
       </header>
-
-      {toast ? (
-        <div className="fixed left-1/2 top-20 z-[80] w-[92%] max-w-md -translate-x-1/2">
-          <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm shadow-xl shadow-slate-950/20">
-            {toast}
-          </div>
-        </div>
-      ) : null}
 
       <section className="relative isolate overflow-hidden bg-slate-950 text-white">
         <img
@@ -272,26 +189,23 @@ export default function CaptainAlsSpecialsLanding() {
               Gulfport, Mississippi
             </div>
             <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
-              Specials worth planning dinner around.
+              Check the specials before you head over.
             </h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-slate-200">
-              Browse current specials, join the updates list, and enter the monthly $100 gift card drawing.
+              The latest weeknight, lunch, happy hour, and $10 menu graphics are all here in one place.
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => setFormOpen(true)}
-                className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-950 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-white/40"
-              >
-                Enter to Win
-              </button>
               <a
                 href="#specials"
-                className="rounded-lg border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/20"
+                className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-950 hover:bg-slate-200"
               >
                 View Specials
               </a>
-              <a href="tel:228-831-5751" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10">
+              <a
+                href="tel:228-831-5751"
+                className="rounded-lg border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/20"
+              >
                 Call to order
               </a>
             </div>
@@ -322,25 +236,10 @@ export default function CaptainAlsSpecialsLanding() {
         <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div>
             <img src={LOGOS.anchor} alt="" aria-hidden="true" className="h-24 w-24 object-contain" />
-            <h2 className="mt-5 text-3xl font-semibold tracking-tight text-slate-950">Get the best stuff before you show up.</h2>
+            <h2 className="mt-5 text-3xl font-semibold tracking-tight text-slate-950">What&apos;s on deck right now.</h2>
             <p className="mt-4 text-sm leading-6 text-slate-600">
-              Weekly specials, happy hour updates, and limited-time offers in one place. Join the list and we will text the latest
-              drops.
+              Tap through the active specials and use the call button when you are ready to order.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                onClick={() => setFormOpen(true)}
-                className="rounded-lg bg-slate-950 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-950/25"
-              >
-                Get specials by text
-              </button>
-              <a
-                href="tel:228-831-5751"
-                className="rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-950 shadow-sm hover:bg-slate-100"
-              >
-                Call Captain Al&apos;s
-              </a>
-            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
@@ -355,9 +254,9 @@ export default function CaptainAlsSpecialsLanding() {
               <div className="mt-2 text-sm leading-6 text-slate-600">Quick weekday plates when you want something easy.</div>
             </div>
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-5">
-              <div className="text-xs font-semibold uppercase text-slate-500">Giveaway</div>
-              <div className="mt-2 text-lg font-semibold text-slate-950">$100 gift card</div>
-              <div className="mt-2 text-sm leading-6 text-slate-600">One entry per phone number per month. No purchase necessary.</div>
+              <div className="text-xs font-semibold uppercase text-slate-500">Bar</div>
+              <div className="mt-2 text-lg font-semibold text-slate-950">Happy hour</div>
+              <div className="mt-2 text-sm leading-6 text-slate-600">See the current drink and bar specials in one tap.</div>
             </div>
           </div>
         </div>
@@ -369,19 +268,48 @@ export default function CaptainAlsSpecialsLanding() {
             <div>
               <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Current specials</h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                Choose a category to pull up the latest graphic. Swipe the image on mobile to move between categories.
+                Tap a category below to switch graphics. On mobile, swipe the image or use the next and previous buttons.
               </p>
             </div>
-            <button
-              onClick={() => setFormOpen(true)}
-              className={["rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none focus:ring-2", accent.button].join(" ")}
+            <a
+              href="tel:228-831-5751"
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-950 shadow-sm hover:bg-slate-100"
             >
-              Enter to Win
-            </button>
+              Call Captain Al&apos;s
+            </a>
           </div>
 
-          <div className="mt-7 grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+          <div className="-mx-4 mt-6 overflow-x-auto px-4 pb-2 lg:hidden">
+            <div className="flex min-w-max gap-3">
+              {CATEGORIES.map((category) => {
+                const isActive = category.key === active;
+                const cardAccent = accentFor(category.key);
+
+                return (
+                  <button
+                    key={category.key}
+                    onClick={() => setActive(category.key)}
+                    className={[
+                      "w-[220px] shrink-0 rounded-lg border p-4 text-left shadow-sm transition",
+                      isActive ? cardAccent.active : "border-slate-200 bg-white text-slate-950",
+                    ].join(" ")}
+                    aria-pressed={isActive}
+                  >
+                    <div className={["inline-flex rounded-lg border px-2 py-1 text-[11px] font-semibold", isActive ? "border-white/30 text-white" : cardAccent.subtle].join(" ")}>
+                      {category.badge}
+                    </div>
+                    <div className="mt-3 text-sm font-semibold">{category.label}</div>
+                    <div className={["mt-2 text-sm leading-6", isActive ? "text-white/85" : "text-slate-600"].join(" ")}>
+                      {category.description}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
+            <div className="hidden gap-3 lg:grid">
               {CATEGORIES.map((category) => {
                 const isActive = category.key === active;
                 const cardAccent = accentFor(category.key);
@@ -415,20 +343,31 @@ export default function CaptainAlsSpecialsLanding() {
               aria-label="Specials viewer"
             >
               <div className={["h-2", accent.bar].join(" ")} />
-              <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                <div>
-                  <div className="text-base font-semibold text-slate-950">{activeCategory.label}</div>
-                  <div className="mt-1 text-sm leading-6 text-slate-600">{activeCategory.description}</div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-col gap-3 border-b border-slate-200 px-4 py-4 sm:px-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <div className="text-base font-semibold text-slate-950">{activeCategory.label}</div>
+                    <div className="mt-1 text-sm leading-6 text-slate-600">{activeCategory.description}</div>
+                  </div>
                   <div className={["rounded-lg border px-3 py-1 text-xs font-semibold", accent.subtle].join(" ")}>
                     {activeCategory.image.updatedText}
                   </div>
+                </div>
+
+                <div className="flex gap-3 lg:hidden">
                   <button
-                    onClick={() => setFormOpen(true)}
-                    className={["rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none focus:ring-2", accent.button].join(" ")}
+                    onClick={() => setRelativeCategory(-1)}
+                    disabled={activeIndex === 0}
+                    className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50"
                   >
-                    Get specials
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setRelativeCategory(1)}
+                    disabled={activeIndex === CATEGORIES.length - 1}
+                    className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50"
+                  >
+                    Next
                   </button>
                 </div>
               </div>
@@ -439,7 +378,7 @@ export default function CaptainAlsSpecialsLanding() {
                     src={activeCategory.image.src}
                     alt={activeCategory.image.alt}
                     loading="lazy"
-                    className="h-auto max-h-[76svh] w-full object-contain"
+                    className="h-auto max-h-[72svh] w-full object-contain"
                   />
                 </div>
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
@@ -480,7 +419,6 @@ export default function CaptainAlsSpecialsLanding() {
                 <a className="font-semibold underline underline-offset-4" href="tel:228-831-5751">
                   228-831-5751
                 </a>
-                <div className="mt-2 text-xs text-slate-500">Reply STOP to unsubscribe from texts.</div>
               </div>
             </div>
           </div>
@@ -498,140 +436,29 @@ export default function CaptainAlsSpecialsLanding() {
                 <Link className="underline underline-offset-4" href="/terms">
                   Terms
                 </Link>
-                <Link className="underline underline-offset-4" href="/giveaway-rules">
-                  Giveaway Rules
-                </Link>
               </div>
             </div>
-            <div className="mt-3">
-              No purchase necessary. Must be 18+. One entry per phone number per month. Winner notified by text or email. Msg &
-              data rates may apply. Consent is not a condition of purchase.
-            </div>
+            <div className="mt-3">Specials, pricing, and hours are subject to change.</div>
           </footer>
         </div>
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur sm:hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
-          <div className="min-w-0 text-xs leading-tight text-slate-700">
-            <span className="block truncate font-semibold text-slate-950">Win a $100 gift card</span>
-            <span className="block truncate text-[11px] text-slate-500">Enter monthly, get specials by text</span>
-          </div>
-          <button
-            onClick={() => setFormOpen(true)}
-            className={["shrink-0 rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none focus:ring-2", accent.button].join(" ")}
+          <a
+            href="#specials"
+            className="flex-1 rounded-lg bg-slate-950 px-4 py-3 text-center text-sm font-semibold text-white"
           >
-            Enter
-          </button>
+            View Specials
+          </a>
+          <a
+            href="tel:228-831-5751"
+            className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-center text-sm font-semibold text-slate-950"
+          >
+            Call
+          </a>
         </div>
       </div>
-
-      {formOpen ? (
-        <div
-          className="fixed inset-0 z-[60] grid place-items-end bg-slate-950/70 p-0 backdrop-blur-[2px] sm:place-items-center sm:p-6"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Enter to win form"
-          onClick={() => !submitting && setFormOpen(false)}
-        >
-          <div
-            className="w-full rounded-t-lg border border-slate-200 bg-white p-5 shadow-2xl sm:max-w-lg sm:rounded-lg sm:p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={["-mx-5 -mt-5 mb-4 h-2 rounded-t-lg sm:-mx-6 sm:-mt-6", accent.bar].join(" ")} />
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="text-lg font-semibold tracking-tight text-slate-950">Enter to win $100 monthly</div>
-                <div className="mt-1 text-sm text-slate-600">You&apos;ll also get weekly specials updates.</div>
-              </div>
-              <button
-                onClick={() => !submitting && setFormOpen(false)}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-slate-50"
-              >
-                Close
-              </button>
-            </div>
-
-            <form className="mt-4 space-y-4" onSubmit={onSubmit}>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <label className="text-sm font-semibold text-slate-950" htmlFor="phone">
-                    Phone number
-                  </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    required
-                    inputMode="tel"
-                    autoComplete="tel"
-                    placeholder="(228) 555-0123"
-                    className={["mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm outline-none focus:ring-2", accent.ring].join(" ")}
-                    disabled={submitting}
-                  />
-                  <div className="mt-2 text-[11px] text-slate-500">One entry per phone number per month.</div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold text-slate-950" htmlFor="name">
-                    Name (optional)
-                  </label>
-                  <input
-                    id="name"
-                    name="name"
-                    autoComplete="name"
-                    placeholder="Blake"
-                    className={["mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm outline-none focus:ring-2", accent.ring].join(" ")}
-                    disabled={submitting}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold text-slate-950" htmlFor="email">
-                    Email (optional)
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="you@email.com"
-                    className={["mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-sm outline-none focus:ring-2", accent.ring].join(" ")}
-                    disabled={submitting}
-                  />
-                </div>
-              </div>
-
-              <label className="flex gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
-                <input
-                  name="consent"
-                  type="checkbox"
-                  className={["mt-1 h-4 w-4 rounded border-slate-300 text-slate-950", accent.ring].join(" ")}
-                  required
-                  disabled={submitting}
-                />
-                <span className="text-xs leading-5 text-slate-700">
-                  I agree to receive recurring marketing text messages and emails from Captain Al&apos;s. Consent is not a condition of purchase. Msg & data rates may apply. Reply STOP to cancel, HELP for help.
-                </span>
-              </label>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className={[
-                  "w-full rounded-lg px-5 py-3 text-sm font-semibold disabled:opacity-60 focus:outline-none focus:ring-2",
-                  accent.button,
-                ].join(" ")}
-              >
-                {submitting ? "Submitting..." : "Enter to win + get specials"}
-              </button>
-
-              <div className="text-[11px] leading-5 text-slate-500">
-                No purchase necessary. Must be 18+. Winner notified by text or email. See giveaway rules.
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
     </main>
   );
 }
