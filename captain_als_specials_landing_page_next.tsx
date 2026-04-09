@@ -23,6 +23,8 @@ const LOGOS = {
   circle: "/logos/circle.PNG",
 };
 
+const BACKGROUND_IMAGE = "/backgrounds/captain-als-neon-wall.PNG";
+
 const LINKS = {
   website: "https://www.captainalsgulfport.com/",
   facebook: "https://www.facebook.com/captainals",
@@ -170,7 +172,15 @@ export default function CaptainAlsSpecialsLanding() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-950">
+    <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-950">
+      <img
+        src={BACKGROUND_IMAGE}
+        alt=""
+        aria-hidden="true"
+        className="fixed inset-0 z-0 h-full w-full object-cover opacity-35"
+      />
+      <div aria-hidden="true" className="fixed inset-0 z-0 bg-slate-950/65" />
+
       <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
           <Link href="/" className="flex min-w-0 items-center gap-3 text-white">
@@ -198,15 +208,7 @@ export default function CaptainAlsSpecialsLanding() {
         </div>
       </header>
 
-      <section className="relative isolate overflow-hidden bg-slate-950 text-white">
-        <img
-          src="/specials/weeknights.PNG"
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full scale-105 object-cover opacity-35 blur-sm"
-        />
-        <div className="absolute inset-0 bg-slate-950/75" />
-
+      <section className="relative z-10 isolate overflow-hidden text-white">
         <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(330px,0.7fr)] lg:items-center lg:py-16">
           <div className="max-w-3xl">
             <img
@@ -269,7 +271,7 @@ export default function CaptainAlsSpecialsLanding() {
         </div>
       </section>
 
-      <section className="hidden bg-white px-4 py-12 md:block">
+      <section className="relative z-10 hidden bg-white/90 px-4 py-12 backdrop-blur-sm md:block">
         <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div>
             <img src={LOGOS.anchor} alt="" aria-hidden="true" className="h-24 w-24 object-contain" />
@@ -299,7 +301,7 @@ export default function CaptainAlsSpecialsLanding() {
         </div>
       </section>
 
-      <section id="specials" className="bg-slate-100 px-4 py-12">
+      <section id="specials" className="relative z-10 bg-slate-100/90 px-4 py-12 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <div>
