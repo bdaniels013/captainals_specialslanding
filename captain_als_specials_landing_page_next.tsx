@@ -182,36 +182,40 @@ export default function CaptainAlsSpecialsLanding() {
         />
         <div className="absolute inset-0 bg-slate-950/75" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(330px,0.7fr)] lg:items-center lg:py-16">
+        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(330px,0.7fr)] lg:items-center lg:py-16">
           <div className="max-w-3xl">
-            <img src={LOGOS.wide} alt="Captain Al's Steak & Seafood" className="h-auto w-full max-w-[560px] object-contain" />
-            <div className="mt-8 inline-flex rounded-lg border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur">
+            <img
+              src={LOGOS.wide}
+              alt="Captain Al's Steak & Seafood"
+              className="mx-auto h-auto w-full max-w-[340px] object-contain sm:mx-0 sm:max-w-[560px]"
+            />
+            <div className="mt-6 inline-flex rounded-lg border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur">
               Gulfport, Mississippi
             </div>
-            <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h1 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
               Check the specials before you head over.
             </h1>
-            <p className="mt-4 max-w-xl text-base leading-7 text-slate-200">
+            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-200 sm:mt-4 sm:text-base sm:leading-7">
               The latest weeknight, lunch, happy hour, and $10 menu graphics are all here in one place.
             </p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center">
               <a
                 href="#specials"
-                className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-950 hover:bg-slate-200"
+                className="rounded-lg bg-white px-6 py-3 text-center text-sm font-semibold text-slate-950 hover:bg-slate-200"
               >
                 View Specials
               </a>
               <a
                 href="tel:228-831-5751"
-                className="rounded-lg border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/20"
+                className="rounded-lg border border-white/25 bg-white/10 px-6 py-3 text-center text-sm font-semibold text-white backdrop-blur hover:bg-white/20"
               >
                 Call to order
               </a>
             </div>
           </div>
 
-          <div className="rounded-lg border border-white/15 bg-white p-3 shadow-2xl shadow-slate-950/30">
+          <div className="hidden rounded-lg border border-white/15 bg-white p-3 shadow-2xl shadow-slate-950/30 lg:block">
             <div className="flex items-center justify-between gap-4 px-1 pb-3">
               <div>
                 <div className="text-sm font-semibold text-slate-950">Featured this week</div>
@@ -232,7 +236,7 @@ export default function CaptainAlsSpecialsLanding() {
         </div>
       </section>
 
-      <section className="bg-white px-4 py-12">
+      <section className="hidden bg-white px-4 py-12 md:block">
         <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div>
             <img src={LOGOS.anchor} alt="" aria-hidden="true" className="h-24 w-24 object-contain" />
@@ -279,33 +283,36 @@ export default function CaptainAlsSpecialsLanding() {
             </a>
           </div>
 
-          <div className="-mx-4 mt-6 overflow-x-auto px-4 pb-2 lg:hidden">
-            <div className="flex min-w-max gap-3">
-              {CATEGORIES.map((category) => {
-                const isActive = category.key === active;
-                const cardAccent = accentFor(category.key);
+          <div className="mt-6 grid grid-cols-2 gap-3 lg:hidden">
+            {CATEGORIES.map((category) => {
+              const isActive = category.key === active;
+              const cardAccent = accentFor(category.key);
 
-                return (
-                  <button
-                    key={category.key}
-                    onClick={() => setActive(category.key)}
+              return (
+                <button
+                  key={category.key}
+                  onClick={() => setActive(category.key)}
+                  className={[
+                    "min-h-[132px] rounded-lg border p-4 text-left shadow-sm transition",
+                    isActive ? cardAccent.active : "border-slate-200 bg-white text-slate-950",
+                  ].join(" ")}
+                  aria-pressed={isActive}
+                >
+                  <div
                     className={[
-                      "w-[220px] shrink-0 rounded-lg border p-4 text-left shadow-sm transition",
-                      isActive ? cardAccent.active : "border-slate-200 bg-white text-slate-950",
+                      "inline-flex rounded-lg border px-2 py-1 text-[11px] font-semibold",
+                      isActive ? "border-white/30 text-white" : cardAccent.subtle,
                     ].join(" ")}
-                    aria-pressed={isActive}
                   >
-                    <div className={["inline-flex rounded-lg border px-2 py-1 text-[11px] font-semibold", isActive ? "border-white/30 text-white" : cardAccent.subtle].join(" ")}>
-                      {category.badge}
-                    </div>
-                    <div className="mt-3 text-sm font-semibold">{category.label}</div>
-                    <div className={["mt-2 text-sm leading-6", isActive ? "text-white/85" : "text-slate-600"].join(" ")}>
-                      {category.description}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    {category.badge}
+                  </div>
+                  <div className="mt-3 text-sm font-semibold leading-5">{category.label}</div>
+                  <div className={["mt-2 text-xs leading-5", isActive ? "text-white/85" : "text-slate-600"].join(" ")}>
+                    {category.image.updatedText}
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           <div className="mt-5 grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
@@ -328,14 +335,13 @@ export default function CaptainAlsSpecialsLanding() {
                       {category.badge}
                     </div>
                     <div className="mt-3 text-sm font-semibold">{category.label}</div>
-                    <div className={["mt-1 text-sm leading-6", isActive ? "text-white/85" : "text-slate-600"].join(" ")}>
+                    <div className={["mt-2 text-sm leading-6", isActive ? "text-white/85" : "text-slate-600"].join(" ")}>
                       {category.description}
                     </div>
                   </button>
                 );
               })}
             </div>
-
             <div
               className={["overflow-hidden rounded-lg border bg-white shadow-sm", accent.border].join(" ")}
               onTouchStart={onTouchStart}
