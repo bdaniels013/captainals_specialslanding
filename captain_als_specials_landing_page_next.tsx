@@ -23,6 +23,15 @@ const LOGOS = {
   circle: "/logos/circle.PNG",
 };
 
+const LINKS = {
+  website: "https://www.captainalsgulfport.com/",
+  facebook: "https://www.facebook.com/captainals",
+  instagram: "https://www.instagram.com/captainals_gulfport/",
+  fullMenu: "https://www.captainalsgulfport.com/places-to-eat-in-gulfport-ms",
+  brunchMenu: "https://www.captainalsgulfport.com/brunch",
+  drinkMenu: "https://www.captainalsgulfport.com/water-front-bar-gulfport-ms",
+};
+
 const CATEGORIES: SpecialsCategory[] = [
   {
     key: "weeknights",
@@ -113,6 +122,22 @@ function accentFor(key: SpecialsKey) {
   }
 }
 
+function FacebookIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-current">
+      <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.53 1.5-3.93 3.78-3.93 1.1 0 2.24.2 2.24.2v2.48H15.2c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.44 2.91h-2.34V22C18.34 21.24 22 17.08 22 12.06Z" />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-current">
+      <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2Zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5ZM12 7.25A4.75 4.75 0 1 1 12 16.75 4.75 4.75 0 0 1 12 7.25Zm0 2A2.75 2.75 0 1 0 12 14.75 2.75 2.75 0 0 0 12 9.25Zm5.25-2.35a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2Z" />
+    </svg>
+  );
+}
+
 export default function CaptainAlsSpecialsLanding() {
   const [active, setActive] = useState<SpecialsKey>("weeknights");
   const touchStartX = useRef<number | null>(null);
@@ -157,6 +182,14 @@ export default function CaptainAlsSpecialsLanding() {
           </Link>
 
           <div className="flex shrink-0 items-center gap-2">
+            <a
+              href={LINKS.website}
+              target="_blank"
+              rel="noreferrer"
+              className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10 md:inline-flex"
+            >
+              Website
+            </a>
             <a
               href="#specials"
               className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10 sm:inline-flex"
@@ -205,6 +238,14 @@ export default function CaptainAlsSpecialsLanding() {
                 className="rounded-lg bg-white px-6 py-3 text-center text-sm font-semibold text-slate-950 hover:bg-slate-200"
               >
                 View Specials
+              </a>
+              <a
+                href={LINKS.fullMenu}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg border border-white/25 bg-white/10 px-6 py-3 text-center text-sm font-semibold text-white backdrop-blur hover:bg-white/20"
+              >
+                Full Menu
               </a>
               <a
                 href="tel:228-831-5751"
@@ -400,6 +441,47 @@ export default function CaptainAlsSpecialsLanding() {
             </div>
           </div>
 
+          <div className="mt-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="text-sm font-semibold text-slate-950">Menus and website</div>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              These open in a new tab so you can keep the specials page handy.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <a
+                href={LINKS.fullMenu}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg bg-slate-950 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800"
+              >
+                Full Menu
+              </a>
+              <a
+                href={LINKS.brunchMenu}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-center text-sm font-semibold text-slate-950 hover:bg-slate-50"
+              >
+                Brunch Menu
+              </a>
+              <a
+                href={LINKS.drinkMenu}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-center text-sm font-semibold text-slate-950 hover:bg-slate-50"
+              >
+                Drink Menu
+              </a>
+              <a
+                href={LINKS.website}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-center text-sm font-semibold text-slate-950 hover:bg-slate-50"
+              >
+                Captain Al&apos;s Website
+              </a>
+            </div>
+          </div>
+
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
               <div className="text-sm font-semibold text-slate-950">Location</div>
@@ -435,7 +517,25 @@ export default function CaptainAlsSpecialsLanding() {
                 <img src={LOGOS.circle} alt="" aria-hidden="true" className="h-10 w-10 object-contain" />
                 <div>Copyright {new Date().getFullYear()} Captain Al&apos;s</div>
               </div>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href={LINKS.facebook}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Captain Al's on Facebook"
+                  className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 bg-white text-slate-950 hover:bg-slate-50"
+                >
+                  <FacebookIcon />
+                </a>
+                <a
+                  href={LINKS.instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Captain Al's on Instagram"
+                  className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 bg-white text-slate-950 hover:bg-slate-50"
+                >
+                  <InstagramIcon />
+                </a>
                 <Link className="underline underline-offset-4" href="/privacy">
                   Privacy
                 </Link>
@@ -452,10 +552,12 @@ export default function CaptainAlsSpecialsLanding() {
       <div className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur sm:hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
           <a
-            href="#specials"
+            href={LINKS.fullMenu}
+            target="_blank"
+            rel="noreferrer"
             className="flex-1 rounded-lg bg-slate-950 px-4 py-3 text-center text-sm font-semibold text-white"
           >
-            View Specials
+            Full Menu
           </a>
           <a
             href="tel:228-831-5751"
