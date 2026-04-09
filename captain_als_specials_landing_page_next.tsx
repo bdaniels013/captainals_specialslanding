@@ -183,14 +183,6 @@ export default function CaptainAlsSpecialsLanding() {
 
           <div className="flex shrink-0 items-center gap-2">
             <a
-              href={LINKS.website}
-              target="_blank"
-              rel="noreferrer"
-              className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10 md:inline-flex"
-            >
-              Website
-            </a>
-            <a
               href="#specials"
               className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10 sm:inline-flex"
             >
